@@ -1,0 +1,17 @@
+{
+  "name": "metroship",
+  "version": "1.0.0",
+  "description": "OAuth implementation for MetroShip",
+  "main": "auth.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "airtable": "^0.12.2",
+    "dotenv": "^16.6.1",
+    "express": "^4.22.2",
+    "pg": "^8.21.0"
+  },
+  "author": "",
+  "license": "ISC"
+}

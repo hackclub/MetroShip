@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <link rel="stylesheet" href="style.css">
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>MetroShip | Home</title>
+        <link rel="icon" type="image/x-icon" href="/images/favicon.png">
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""></script>
+    </head>
+    <body>
+        <nav class = "navbar">
+            <div class = "navbar container">
+                <div class = "title">
+                    <h1 style="color:rgb(255, 0, 0);"><a href = "index.html">Welcome To MetroShip!</a></h1>
+                </div>
+                <div class = "banner-image">
+                    <img src = "images/Transit Banner.png" width = 95% height = 50%>
+    
+                </div>
+                <div class = "main-menu">
+                    <ul>
+                    <li><h4 id="user-status"></h2></li>
+                    <br>
+                    <li><a href="index.html" id="home">Home</a></li>
+                    <li><a href="#" id="login-link"></a></li>
+                    <li><a href="#" id="projects">Projects</a></li>
+                    <li><a href="#" id="prizes">Prizes</a></li>
+                    <li><a href="#" id="logout-link"></a></li>
+
+
+                    </ul>
+    
+                </div>
+                
+
+            </div>
+            
+        </nav>
+        <div class = "aboutbox">
+            <h1>What is MetroShip?</h1>
+            <br>
+            <p>MetroShip is a You Ship We Ship program (YSWS) in which you will build a map website using dynamic or static data and OpenStreetMap to recieve a variety of transit-related merchandise!</p>
+            <p>MetroShip uses Hackatime to track hours spent on building the website(s), and prizes will be awarded at certain time checkpoints and project completion.</p>
+            <p>Below is an example map:</p>
+        </div>
+        <div class = "mapbox">
+            <div id="map"></div>
+        </div>
+        <script src="map.js"></script>
+        <script src="auth.js"></script>
+
+    </body>
+</html>

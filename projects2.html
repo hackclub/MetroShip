@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <link rel="stylesheet" href="style.css">
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>MetroShip | Projects</title>
+        <link rel="icon" type="image/x-icon" href="/images/favicon.png">
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""></script>
+    </head>
+    <body>
+        <nav class = "navbar">
+            <div class = "navbar container">
+                <div class = "title">
+                    <h1 style="color:rgb(255, 0, 0);"><a href = "index.html">Welcome To MetroShip!</a></h1>
+                </div>
+                <div class = "banner-image">
+                    <img src = "images/Transit Banner.png" width = 95% height = 50%>
+    
+                </div>
+                <div class = "main-menu">
+                    <ul>
+                    <li><h4 href="#" id="htuser-status"></h4></li>
+                    <br>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="#" id="htlogin-link"></a></li>
+                    <li><a href="#" id="projects">Projects</a></li>
+                    <li><a href="#" id="prizes">Prizes</a></li>
+                    <li><a href="#" id="htlogout-link"></a></li>
+                    <li><a href="reviewer.html" id="reviewer-link" style="display:none; color:rgb(255,0,144);">Reviewer</a></li>
+                    </ul>
+    
+                </div>
+                
+
+            </div>
+            
+        </nav>
+        <div class = "projects-page">
+            <a href="#" id="new-project"></a> 
+            
+            <div id="projects-container"></div>
+            
+            <div id="overlay"></div>
+        </div>
+    
+        <script src="hackatime-auth.js"></script>
+        <script src="projects.js"></script>
+        <script src="project-deets.js"></script>
+
+    </body>
+</html>

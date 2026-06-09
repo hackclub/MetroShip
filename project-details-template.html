@@ -1,0 +1,78 @@
+<div class="overlay-content" style="background: #0f0f0f;
+    border: 2px solid rgb(255, 0, 144);
+    padding: 20px;
+    margin: 5% auto;
+    width: 70%;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+    pointer-events: auto;
+    border-radius:10px;">
+    <span class="close-btn" style="position: absolute; top: 10px; right: 20px; font-size: 30px; cursor: pointer; color: red;">&times;</span>
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+        <h2 id="overlay-title" style="color: aqua; margin: 0;">{{PROJECT_NAME}}</h2>
+        <span class="edit-name-btn" style="cursor: pointer; display: flex; align-items: center;">
+            <img src="images/edit-button.png" alt="edit name" style="height: 1.5em;">
+        </span>
+    </div>
+    <hr style="border-color: aqua;">
+    <div class="details-body" style="font-size: 1.4vw; color: rgb(255, 67, 205);">
+        <p>You are viewing details for: <strong>{{PROJECT_NAME}}</strong></p>
+        <p>Email: <span style="color: aqua;">{{EMAIL}}</span></p>
+
+        <p style="display:flex; align-items:center; gap:8px;">
+            Description:&nbsp;
+            <span id="desc-display" style="color: aqua;">{{DESC}}</span>
+            <span class="edit-field-btn" data-field="Description" style="cursor:pointer; display:flex; align-items:center;">
+                <img src="images/edit-button.png" alt="edit" style="height:1em;">
+            </span>
+            <span class="edit-field-input" data-field="Description" style="display:none; align-items:center; gap:6px;">
+                <input type="text" class="field-input" data-field="Description" value="{{DESC}}"
+                    style="background:#111; color:aqua; border:1px solid aqua; border-radius:4px; padding:2px 6px; font-size:1vw; width:20vw;">
+                <button class="save-field-btn" data-field="Description" style="cursor:pointer; background:#111; color:limegreen; border:1px solid limegreen; border-radius:4px; padding:2px 8px; font-size:0.9vw;">Save</button>
+                <button class="cancel-field-btn" data-field="Description" style="cursor:pointer; background:#111; color:red; border:1px solid red; border-radius:4px; padding:2px 8px; font-size:0.9vw;">Cancel</button>
+            </span>
+        </p>
+
+        <p style="display:flex; align-items:center; gap:8px;">
+            Code URL:&nbsp;
+            <span id="codeurl-display" style="color: aqua;">{{CODEURL}}</span>
+            <span class="edit-field-btn" data-field="Code URL" style="cursor:pointer; display:flex; align-items:center;">
+                <img src="images/edit-button.png" alt="edit" style="height:1em;">
+            </span>
+            <span class="edit-field-input" data-field="Code URL" style="display:none; align-items:center; gap:6px;">
+                <input type="text" class="field-input" data-field="Code URL" value="{{CODEURL}}"
+                    style="background:#111; color:aqua; border:1px solid aqua; border-radius:4px; padding:2px 6px; font-size:1vw; width:20vw;">
+                <button class="save-field-btn" data-field="Code URL" style="cursor:pointer; background:#111; color:limegreen; border:1px solid limegreen; border-radius:4px; padding:2px 8px; font-size:0.9vw;">Save</button>
+                <button class="cancel-field-btn" data-field="Code URL" style="cursor:pointer; background:#111; color:red; border:1px solid red; border-radius:4px; padding:2px 8px; font-size:0.9vw;">Cancel</button>
+            </span>
+        </p>
+
+        <p style="display:flex; align-items:center; gap:8px;">
+            Demo URL:&nbsp;
+            <span id="demourl-display" style="color: aqua;">{{DEMOURL}}</span>
+            <span class="edit-field-btn" data-field="Demo URL" style="cursor:pointer; display:flex; align-items:center;">
+                <img src="images/edit-button.png" alt="edit" style="height:1em;">
+            </span>
+            <span class="edit-field-input" data-field="Demo URL" style="display:none; align-items:center; gap:6px;">
+                <input type="text" class="field-input" data-field="Demo URL" value="{{DEMOURL}}"
+                    style="background:#111; color:aqua; border:1px solid aqua; border-radius:4px; padding:2px 6px; font-size:1vw; width:20vw;">
+                <button class="save-field-btn" data-field="Demo URL" style="cursor:pointer; background:#111; color:limegreen; border:1px solid limegreen; border-radius:4px; padding:2px 8px; font-size:0.9vw;">Save</button>
+                <button class="cancel-field-btn" data-field="Demo URL" style="cursor:pointer; background:#111; color:red; border:1px solid red; border-radius:4px; padding:2px 8px; font-size:0.9vw;">Cancel</button>
+            </span>
+        </p>
+
+        <p>
+            Total Time Logged: <span style="color: aqua;">{{HOURS}} hours</span><br>
+            Time Logged as MetroShip: <span style="color: limegreen;">{{METROSHIP_HOURS}} hours</span>
+            <div id="connect-project">Connect to Hackatime</div>
+            <select id="project-select"></select>
+        </p>
+
+        <div style="margin-top: 16px;">
+            <button id="ship-btn" data-shipped="{{SHIPPED}}"
+                style="cursor:pointer; padding: 8px 20px; font-size:1.2vw; border-radius:6px; border: 2px solid limegreen; background:#111; color:limegreen; font-family:inherit;">
+            </button>
+        </div>
+    </div>
+</div>

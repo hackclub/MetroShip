@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <link rel="stylesheet" href="style.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>MetroShip | Prizes</title>
+        <link rel="icon" type="image/x-icon" href="/images/favicon.png">
+    </head>
+    <body>
+        <nav class = "navbar">
+            <div class = "navbar container">
+                <div class = "title">
+                    <h1 style="color:rgb(255, 0, 0);"><a href = "index.html">Welcome To MetroShip!</a></h1>
+                </div>
+                <div class = "banner-image">
+                    <img src = "images/Transit Banner.png" width = 95% height = 50%>
+
+                </div>
+                <div class = "main-menu">
+                    <ul>
+                    <li><h4 href="#" id="htuser-status"></h4></li>
+                    <br>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="#" id="htlogin-link"></a></li>
+                    <li><a href="#" id="projects">Projects</a></li>
+                    <li><a href="#" id="prizes">Prizes</a></li>
+                    <li><a href="#" id="htlogout-link"></a></li>
+                    <li><a href="reviewer.html" id="reviewer-link" style="display:none; color:rgb(255,0,144);">Reviewer</a></li>
+                    </ul>
+
+                </div>
+
+
+            </div>
+
+        </nav>
+        <div id="token-display" class="token-display"></div>
+        <div style="display: flex; justify-content: space-evenly; align-items: center; padding: 0 2%;">
+            <span class="prizes-line-art-container">
+                <img src="images/line-art1.png" alt="Decorative Line Art" class="line-art1" style="transform: scaleY(-1) scaleX(-1);">
+            </span>
+
+            <h2 style="margin: 0; font-size: 4vw; color: rgb(255, 0, 0); font-family: 'Nasalization';">Prizes</h2>
+
+            <span class="prizes-line-art-container">
+                <!-- Added scaleX(-1) to flip the second one horizontally for symmetry -->
+                <img src="images/line-art1.png" alt="Decorative Line Art" class="line-art1">
+            </span>
+        </div>
+        <div class="prizes-container">
+            <img src="images/prizes-background.png" alt="Background Image" class="background-image">
+            <!-- Adjust vertical position by changing the 'top' value -->
+             <div class="prize-card" style="top: -8vw;"
+                data-name="Prize Store"
+                data-tickets="Tickets"
+                data-description="Welcome to the MetroShip Prize Store! Spend the tickets you earn from shipping projects here on exclusive transit-themed gear."
+                data-image=""
+                data-items='[{"name": "Welcome Pin", "img": "assets/amtrk-acela-pin.webp"}]'>
+                <div class="prize-hours">Tickets</div>
+                <div class="prize-info">
+                    <h2 style="color: aqua; margin: 0;">Prize Store</h2>
+                    <p style="margin: 5px 0 0 0;">Get tickets from shipping projects (1/hr) and get prizes here!</p>
+                </div>
+
+            </div>
+            <div class="prize-card" style="top: -3vw;"
+                data-name="Sticker Street"
+                data-tickets="1 Ticket"
+                data-description="A variety of cool stickers. Perfect for laptops and station pillars!"
+                data-image="assets/MTA-sticker1.jpg"
+                data-items='[{"name": "MTA Sticker Pack", "img": "assets/MTA-sticker1.jpg"},
+                {"name": "MTR Sticker Pack", "img": "assets/MTR-sticker.jpg"}, {"name": "MTA Sticker", "img": "assets/MTA-sticker2.jpg"}, {"name": "BART X Beast Sticker", "img": "assets/BART-sticker1.webp"}, {"name": "BART Train Sticker", "img": "assets/BART-sticker2.png"},
+                {"name": "SEPTA Sticker", "img": "assets/SEPTA-sticker.webp"}, {"name": "5 Random Hack Club Stickers", "img": "assets/HackClub-sticker.png"}]'>
+                <div class="prize-hours">1<br>Ticket</div>
+                <div class="prize-info">
+                    <h2 style="color: aqua; margin: 0;">Sticker Street</h2>
+                    <p style="margin: 5px 0 0 0;">Stickers!</p>
+                </div>
+                <div class="prize-image">
+                    <img src="assets/MTA-sticker1.jpg">
+                </div>
+            </div>
+            <div class="prize-card" style="top: 0vw;"
+                data-name="Key-Pin Parkway"
+                data-tickets="2 Tickets"
+                data-description="Collectible enamel pins and keychains modeled after iconic rolling stock and transit logos."
+                data-image="assets/SEPTA-keychain.webp"
+                data-items='[{"name": "MTR Airport Express Keychain", "img": "assets/MTR-keychain.jpg"}, {"name": "BART Fleet Keychain", "img": "assets/BART-keychain1.jpg"}, {"name": "BART Legacy Train Keychain", "img": "assets/BART-keychain2.png"},
+                {"name": "MTA Subway Spinner Keyring", "img": "assets/MTA-keychain1.jpg"}, {"name": "MTA Grand Central Keychain", "img": "assets/MTA-keychain2.jpg"}, {"name": "Amtrak Acela Pin", "img": "assets/Amtrak-pin.png"},
+                {"name": "SEPTA Logo Pin", "img": "assets/SEPTA-pin.webp"}, {"name": "SEPTA Keychain", "img": "assets/SEPTA-keychain.webp"}]'>
+                <div class="prize-hours">2<br>Tickets</div>
+                <div class="prize-info">
+                    <h2 style="color: aqua; margin: 0;">Key-Pin Parkway</h2>
+                    <p style="margin: 5px 0 0 0;">Enamel pins and keychains!</p>
+                </div>
+                <div class="prize-image">
+                    <img src="assets/SEPTA-keychain.webp">
+                </div>
+            </div>
+            <div class="prize-card" style="top: 0vw;"
+                data-name="Plushie Place"
+                data-tickets="4 Tickets"
+                data-description="Soft and cuddly Amtrak or BART plushies. The ultimate companion for long-distance rail journeys."
+                data-image="assets/Amtrak-plush.jpg"
+                data-items='[{"name": "Amtrak Plush", "img": "assets/Amtrak-plush.jpg"}, {"name": "BART Plush", "img": "assets/BART-plush.webp"}, {"name": "BART Pillow", "img": "assets/BART-pillow.jpg"},
+                {"name": "MBTA Red Line Plush", "img": "assets/MBTA-plush.jpg"}]'>
+                <div class="prize-hours">4<br>Tickets</div>
+                <div class="prize-info">
+                    <h2 style="color: aqua; margin: 0;">Plushie Place</h2>
+                    <p style="margin: 5px 0 0 0;">Amtrak or BART Plushie!</p>
+                </div>
+                <div class="prize-image">
+                    <img src="assets/Amtrak-plush.jpg">
+                </div>
+            </div>
+            <div class="prize-card" style="top: 3vw;"
+                data-name="Poster Square"
+                data-tickets="4 Tickets"
+                data-description="Vibrant transit posters and stylized maps. A great way to bring the subway aesthetic into your room."
+                data-image="assets/NJT-poster.png"
+                data-items='[{"name": "NJT World Cup Poster", "img": "assets/NJT-poster.png"}, {"name": "SEPTA Map Poster", "img": "assets/SEPTA-poster.webp"}, {"name": "MTA Grand Central Terminal Poster", "img": "assets/MTA-poster1.jpg"}, {"name": "MTA Travel Time", "img": "assets/MTA-poster2.jpg"}, {"name": "BART Map Poster", "img": "assets/BART-poster.png"}]'>
+                <div class="prize-hours">4<br>Tickets</div>
+                <div class="prize-info">
+                    <h2 style="color: aqua; margin: 0;">Poster Square</h2>
+                    <p style="margin: 5px 0 0 0;">Cool posters!</p>
+                </div>
+                <div class="prize-image">
+                    <img src="assets/NJT-poster.png">
+                </div>
+            </div>
+            <div class="prize-card" style="top: 6vw;"
+                data-name="Rainy Railroad"
+                data-tickets="4 Tickets"
+                data-description="High-quality umbrellas featuring MetroShip branding. Stay dry while waiting for your connection."
+                data-image="assets/SEPTA-umbrella.webp"
+                data-items='[{"name": "MTR Umbrella (Pink)", "img": "assets/MTR-umbrella1.jpg"}, {"name": "MTR Umbrella (Blue)", "img": "assets/MTR-umbrella2.png"}, {"name": "BART Umbrella", "img": "assets/BART-umbrella.webp"},
+                {"name": "SEPTA Umbrella", "img": "assets/SEPTA-umbrella.webp"}]'>
+                <div class="prize-hours">4<br>Tickets</div>
+                <div class="prize-info">
+                    <h2 style="color: aqua; margin: 0;">Rainy Railroad</h2>
+                    <p style="margin: 5px 0 0 0;">Umbrellas!</p>
+                </div>
+                <div class="prize-image">
+                    <img src="assets/SEPTA-umbrella.webp">
+                </div>
+            </div>
+
+            <div class="prize-card" style="top: 8vw;"
+                data-name="Bottle Branchline"
+                data-tickets="5 Tickets"
+                data-description="Insulated water bottles and tumblers designed to fit perfectly in your backpack's side pocket."
+                data-image="assets/MTR-bottle.jpg"
+                data-items='[{"name": "MTR Water Bottle", "img": "assets/MTR-bottle.jpg"}, {"name": "Amtrak Tumbler", "img": "assets/Amtrak-bottle.jpg"}, {"name": "SEPTA Map Bottle", "img": "assets/SEPTA-bottle1.webp"},
+                {"name": "SEPTA 20oz Logo Bottle", "img": "assets/SEPTA-bottle2.webp"},
+                {"name": "BART Map Bottle", "img": "assets/BART-bottle.jpg"}, {"name": "NJT Tumbler", "img": "assets/NJT-bottle.jpg"}]'>
+                <div class="prize-hours">5<br>Tickets</div>
+                <div class="prize-info">
+                    <h2 style="color: aqua; margin: 0;">Bottle Branchline</h2>
+                    <p style="margin: 5px 0 0 0;">Water bottle and tumblers!</p>
+                </div>
+                <div class="prize-image">
+                    <img src="assets/MTR-bottle.jpg">
+                </div>
+            </div>
+            <div class="prize-card" style="top: 11vw;"
+                data-name="Apparel Avenue"
+                data-tickets="5 Tickets"
+                data-description="Stylish t-shirts and heavy-duty canvas tote bags for carrying your project gear."
+                data-image="assets/SEPTA-shirt.webp"
+                data-items='[{"name": "BART Skull Shirt", "img": "assets/BART-shirt.jpg"},
+                {"name": "SEPTA Park Ranger Shirt", "img": "assets/SEPTA-shirt.webp"},
+                {"name": "Amtrak Retro Collection Shirt", "img": "assets/Amtrak-shirt.jpg"}, {"name": "MBTA Map Shirt (Black)", "img": "assets/MBTA-shirt.png"},
+                {"name": "NJT Transit Riders Save the Earth Shirt", "img": "assets/NJT-shirt.jpg"}, {"name": "MTA Subway Map Shirt", "img": "assets/MTA-shirt1.jpg"},
+                {"name": "MTA Subway Multi Route Shirt", "img": "assets/MTA-shirt2.jpg"},
+                {"name": "SEPTA Rail Map Tote", "img": "assets/SEPTA-tote.webp"}, {"name": "MBTA Rail Map Tote", "img": "assets/MBTA-tote1.jpg"}, {"name": "MBTA Green Line Tote", "img": "assets/MBTA-tote2.jpg"},
+                {"name": "NJT Riders Save the Earth Tote", "img": "assets/NJT-tote.jpg"}, {"name": "MTA 50th Anniversary of NY Transit Museum Tote", "img": "assets/MTA-tote1.jpg"},
+                {"name": "MTA R211 Brooklyn G Tote", "img": "assets/MTA-tote2.jpg"}, {"name": "MTA Vintage Buses Tote", "img": "assets/MTA-tote3.jpg"}, {"name": "MTR Stations Tote", "img": "assets/MTR-tote.png"},
+                {"name": "BART Map Tote", "img": "assets/BART-tote1.png"}, {"name": "BART Legacy Train Tote", "img": "assets/BART-tote2.jpg"}]'>
+                <div class="prize-hours">5<br>Tickets</div>
+                <div class="prize-info">
+                    <h2 style="color: aqua; margin: 0;">Apparel Avenue</h2>
+                    <p style="margin: 5px 0 0 0;">Shirts and totes!</p>
+                </div>
+                <div class="prize-image">
+                    <img src="assets/SEPTA-shirt.webp">
+                </div>
+            </div>
+            <div class="prize-card" style="top: 14vw;"
+                data-name="Sweater Station"
+                data-tickets="8 Tickets"
+                data-description="Thick, cozy sweaters and hoodies—perfect for late-night hacking or chilly morning commutes."
+                data-image="assets/MTA-sweater.jpg"
+                data-items='[{"name": "MBTA Hoodie", "img": "assets/MBTA-sweater.png"}, {"name": "BART Zip Hoodie", "img": "assets/BART-sweater.webp"}, {"name": "SEPTA Sweater", "img": "assets/SEPTA-sweater.webp"},
+                {"name": "MTA Sweater", "img": "assets/MTA-sweater.jpg"}, {"name": "NJT Sweater (Black)", "img": "assets/NJT-sweater.jpg"}]'>
+                <div class="prize-hours">8<br>Tickets</div>
+                <div class="prize-info">
+                    <h2 style="color: aqua; margin: 0;">Sweater Station</h2>
+                    <p style="margin: 5px 0 0 0;">Sweaters and Hoodies!</p>
+                </div>
+                <div class="prize-image">
+                    <img src="assets/MTA-sweater.jpg">
+                </div>
+            </div>
+            <div class="prize-card" style="top: 16vw;"
+                data-name="Backpack Broadway"
+                data-tickets="10 Tickets"
+                data-description="The ultimate commuter backpack. Durable, spacious, and transit-ready."
+                data-image="assets/SEPTA-backpack2.webp"
+                data-items='[{"name": "MTA Backpack", "img": "assets/MTA-backpack.jpg"}, {"name": "NJT Chevron Commuter Backpack", "img": "assets/NJT-backpack.jpg"}, {"name": "SEPTA Backpack", "img": "assets/SEPTA-backpack1.webp"},
+                {"name": "SEPTA X Carhartt Backpack", "img": "assets/SEPTA-backpack2.webp"}, {"name": "BART Backpack", "img": "assets/BART-backpack.webp"}]'>
+                <div class="prize-hours">10<br>Tickets</div>
+                <div class="prize-info">
+                    <h2 style="color: aqua; margin: 0;">Backpack Broadway</h2>
+                    <p style="margin: 5px 0 0 0;">Backpacks!</p>
+                </div>
+                <div class="prize-image">
+                    <img src="assets/SEPTA-backpack2.webp">
+                </div>
+            </div>
+
+        </div>
+
+        <div id="overlay"></div>
+
+        <!-- Cart toggle button -->
+        <button id="cart-toggle" style="position:fixed;bottom:1.5rem;right:1.5rem;z-index:9998;cursor:pointer;padding:0.55rem 1.1rem;font-size:1vw;border-radius:8px;border:2px solid aqua;background:#0a0a0a;color:aqua;font-family:'Nasalization';letter-spacing:0.04em;box-shadow:0 0 14px rgba(0,255,255,0.25);">
+            Cart (<span id="cart-count">0</span>)
+        </button>
+
+        <!-- Cart panel -->
+        <div id="cart-panel" style="display:none;position:fixed;top:0;right:0;height:100vh;width:22vw;min-width:270px;background:#0a0a0a;border-left:2px solid aqua;z-index:9999;flex-direction:column;box-shadow:-6px 0 24px rgba(0,255,255,0.12);">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid #1a1a1a;flex-shrink:0;">
+                <h3 style="color:aqua;font-family:'Nasalization';font-size:1.15vw;margin:0;letter-spacing:0.05em;">Cart</h3>
+                <button id="close-cart" style="background:none;border:none;color:#666;font-size:1.4vw;cursor:pointer;padding:2px 6px;line-height:1;">&times;</button>
+            </div>
+            <div id="cart-items-list" style="flex:1;overflow-y:auto;padding:0 20px;"></div>
+            <div style="padding:16px 20px;border-top:1px solid #1a1a1a;flex-shrink:0;">
+                <div id="cart-total-display" style="margin-bottom:12px;"></div>
+                <button id="checkout-btn" style="width:100%;padding:10px;font-size:0.9vw;border-radius:6px;border:2px solid limegreen;background:#0a0a0a;color:limegreen;cursor:pointer;font-family:'Nasalization';letter-spacing:0.05em;font-weight:bold;">
+                    Checkout
+                </button>
+            </div>
+        </div>
+
+        <script src="hackatime-auth.js"></script>
+        <script src="prize-deets.js"></script>
+        <script src="tokens.js"></script>
+
+
+    </body>
+</html>
