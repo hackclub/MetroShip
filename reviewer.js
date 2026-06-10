@@ -14,7 +14,11 @@ function getSortedFiltered(query) {
                 || (f['Description'] || '').toLowerCase().includes(q);
         });
     }
-    records.sort((a, b) => (a.fields['Verified'] ? 1 : 0) - (b.fields['Verified'] ? 1 : 0));
+    records.sort((a, b) => {
+        const aRet = !!a.fields['Returned'], bRet = !!b.fields['Returned'];
+        if (aRet !== bRet) return aRet ? 1 : -1;
+        return (a.fields['Verified'] ? 1 : 0) - (b.fields['Verified'] ? 1 : 0);
+    });
     return records;
 }
 
@@ -171,12 +175,14 @@ function renderProjects(records) {
             ? `<a href="${f['Demo URL']}" target="_blank" style="color:aqua;">${f['Demo URL']}</a>`
             : '<span style="color:#555;">N/A</span>';
 
+        const returned = !!f['Returned'];
         const claimedHours = f['Hours (Computed)'] != null ? f['Hours (Computed)']
             : f['Hours Logged'] != null ? f['Hours Logged']
             : f['Hours'] != null ? f['Hours'] : null;
         const overrideHours = f['Optional - Override Hours Spent'] != null ? f['Optional - Override Hours Spent'] : '';
         const overrideReason = f['Optional - Override Hours Spent Justification'] || '';
         const effectiveHours = overrideHours !== '' ? overrideHours : claimedHours;
+        const userResponse = f['User Override Response'] || '';
 
         const hoursHtml = `
             <p style="margin:4px 0;font-size:1vw;">
@@ -206,18 +212,28 @@ function renderProjects(records) {
                         style="cursor:pointer;padding:2px 10px;font-size:0.85vw;border-radius:4px;border:1px solid aqua;background:#111;color:aqua;font-family:inherit;">Save</button>
                     <span class="override-status" data-id="${record.id}" style="color:limegreen;font-size:0.8vw;"></span>
                 </div>
-            </div>`;
+            </div>
+            ${userResponse ? `
+            <div style="margin:6px 0 8px 0;padding:8px 10px;background:#0a180a;border:1px solid limegreen;border-radius:4px;font-size:0.9vw;">
+                <span style="color:#aaa;">User response: </span>
+                <span style="color:limegreen;">${userResponse.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>
+            </div>` : ''}`;
+
+        const cardBorderColor = returned ? 'orange' : verified ? 'limegreen' : 'rgb(255,0,144)';
+        const returnedBadge = returned
+            ? `<span style="background:orange;color:#111;font-size:0.75vw;font-weight:bold;padding:2px 8px;border-radius:3px;margin-left:10px;vertical-align:middle;">RETURNED</span>`
+            : '';
 
         return `
         <div class="reviewer-card" data-id="${record.id}" style="
             background:#111;
-            border:1px solid ${verified ? 'limegreen' : 'rgb(255,0,144)'};
+            border:1px solid ${cardBorderColor};
             border-radius:8px;
             padding:16px 20px;
             margin-bottom:16px;">
             <div style="display:flex;justify-content:space-between;align-items:flex-start;">
                 <div style="flex:1;min-width:0;">
-                    <h3 style="color:aqua;margin:0 0 8px 0;font-size:1.4vw;">${f['Project Name'] || 'Unnamed'}</h3>
+                    <h3 style="color:aqua;margin:0 0 8px 0;font-size:1.4vw;">${f['Project Name'] || 'Unnamed'}${returnedBadge}</h3>
                     <p style="margin:4px 0;font-size:1vw;"><strong>Email:</strong> <span style="color:aqua;">${f['Email'] || 'N/A'}</span></p>
                     <p style="margin:4px 0;font-size:1vw;"><strong>Description:</strong> <span style="color:aqua;">${f['Description'] || 'N/A'}</span></p>
                     <p style="margin:4px 0;font-size:1vw;"><strong>Code URL:</strong> ${codeUrl}</p>
@@ -238,16 +254,30 @@ function renderProjects(records) {
                         </div>
                     </div>
                 </div>
-                <button class="verify-btn"
-                    data-id="${record.id}"
-                    data-name="${(f['Project Name'] || 'Unnamed').replace(/"/g, '&quot;')}"
-                    data-verified="${verified}"
-                    style="cursor:pointer;padding:8px 16px;font-size:1vw;border-radius:6px;font-family:inherit;flex-shrink:0;margin-left:16px;
-                        border:2px solid ${verified ? 'limegreen' : '#888'};
-                        background:#111;
-                        color:${verified ? 'limegreen' : '#888'};">
-                    ${verified ? '&#10003; Verified' : 'Mark Verified'}
-                </button>
+                <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0;margin-left:16px;">
+                    <button class="verify-btn"
+                        data-id="${record.id}"
+                        data-name="${(f['Project Name'] || 'Unnamed').replace(/"/g, '&quot;')}"
+                        data-verified="${verified}"
+                        style="cursor:pointer;padding:8px 16px;font-size:1vw;border-radius:6px;font-family:inherit;
+                            border:2px solid ${verified ? 'limegreen' : '#888'};
+                            background:#111;
+                            color:${verified ? 'limegreen' : '#888'};">
+                        ${verified ? '&#10003; Verified' : 'Mark Verified'}
+                    </button>
+                    <button class="return-btn"
+                        data-id="${record.id}"
+                        data-name="${(f['Project Name'] || 'Unnamed').replace(/"/g, '&quot;')}"
+                        data-returned="${returned}"
+                        ${verified && !returned ? 'disabled title="Unverify before returning"' : ''}
+                        style="cursor:${verified && !returned ? 'not-allowed' : 'pointer'};padding:8px 16px;font-size:1vw;border-radius:6px;font-family:inherit;
+                            border:2px solid ${returned ? 'orange' : verified ? '#333' : '#666'};
+                            background:#111;
+                            color:${returned ? 'orange' : verified ? '#333' : '#666'};
+                            opacity:${verified && !returned ? '0.4' : '1'};">
+                        ${returned ? '&#8629; Returned' : 'Return'}
+                    </button>
+                </div>
             </div>
         </div>`;
     }).join('');
@@ -330,6 +360,56 @@ document.addEventListener('click', async (e) => {
             await doToggle(recordId, previousVerified);
             refreshDisplay();
         } catch (err) { console.error('Error undoing:', err); }
+        return;
+    }
+
+    const returnBtn = e.target.closest('.return-btn');
+    if (returnBtn) {
+        const id = returnBtn.dataset.id;
+        const projectName = returnBtn.dataset.name || id;
+        const currentReturned = returnBtn.dataset.returned === 'true';
+        const newReturned = !currentReturned;
+
+        // Block returning a verified project — reviewer must unverify first
+        if (newReturned) {
+            const rec = allRecords.find(r => r.id === id);
+            if (rec && rec.fields['Verified']) {
+                alert(`"${projectName}" is verified. Unverify it before returning it.`);
+                return;
+            }
+        }
+
+        const confirmMsg = newReturned
+            ? `Return "${projectName}" to the user as unshipped?`
+            : `Un-return "${projectName}"? It will go back to Not Shipped status.`;
+        if (!confirm(confirmMsg)) return;
+        try {
+            const reviewerEmail = localStorage.getItem('email');
+            const reasonInput = document.querySelector(`.override-reason-input[data-id="${id}"]`);
+            const reason = reasonInput ? reasonInput.value.trim() || null : null;
+            const res = await fetch('/api/return-project', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ recordId: id, reviewerEmail, returned: newReturned, reason })
+            });
+            const data = await res.json();
+            if (data.success) {
+                const rec = allRecords.find(r => r.id === id);
+                if (rec) {
+                    rec.fields['Returned'] = newReturned || null;
+                    if (newReturned) {
+                        rec.fields['Shipped'] = false;
+                        rec.fields['Optional - Override Hours Spent Justification'] = reason;
+                    }
+                }
+                refreshDisplay();
+            } else {
+                alert(`Failed to ${newReturned ? 'return' : 'un-return'} project: ${data.error || 'Unknown error'}`);
+            }
+        } catch (err) {
+            console.error('Error toggling return:', err);
+            alert('Network error — could not save. Check console for details.');
+        }
         return;
     }
 

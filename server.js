@@ -459,7 +459,7 @@ app.post('/api/get-shipped-projects', async (req, res) => {
             {
                 method: 'POST',
                 headers: { Authorization: `Bearer ${AIRTABLE_PAT}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ filterByFormula: `{Shipped}=TRUE()` })
+                body: JSON.stringify({ filterByFormula: `OR({Shipped}=TRUE(), {Returned}=TRUE())` })
             }
         );
         const body = await response.text();
@@ -496,6 +496,83 @@ app.post('/api/toggle-verified', async (req, res) => {
         return res.status(200).json({ success: true, data: JSON.parse(body) });
     } catch (error) {
         console.error('toggle-verified error:', error);
+        return res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+app.post('/api/delete-project', async (req, res) => {
+    try {
+        const { recordId, email } = req.body;
+        if (!recordId || !email) return res.status(400).json({ error: 'recordId and email are required' });
+        const AIRTABLE_PAT = process.env.AIRTABLE_PAT;
+        const BASE_ID = process.env.AIRTABLE_BASE_ID;
+        if (!AIRTABLE_PAT || !BASE_ID) return res.status(500).json({ error: 'Airtable configuration missing.' });
+
+        // Verify ownership before deleting
+        const getRes = await fetch(
+            `https://api.airtable.com/v0/${BASE_ID}/YSWS%20Project%20Submission/${recordId}`,
+            { headers: { Authorization: `Bearer ${AIRTABLE_PAT}` } }
+        );
+        if (!getRes.ok) return res.status(404).json({ error: 'Record not found' });
+        const record = await getRes.json();
+        if (record.fields?.Email !== email) {
+            return res.status(403).json({ error: 'Not authorized to delete this project' });
+        }
+
+        const delRes = await fetch(
+            `https://api.airtable.com/v0/${BASE_ID}/YSWS%20Project%20Submission/${recordId}`,
+            { method: 'DELETE', headers: { Authorization: `Bearer ${AIRTABLE_PAT}` } }
+        );
+        const body = await delRes.text();
+        if (!delRes.ok) return res.status(delRes.status).json({ error: 'Airtable delete failed', detail: body });
+        return res.status(200).json({ success: true });
+    } catch (error) {
+        console.error('delete-project error:', error);
+        return res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+app.post('/api/return-project', async (req, res) => {
+    try {
+        const { recordId, reviewerEmail, returned = true, reason } = req.body;
+        if (!REVIEWER_EMAILS.includes(reviewerEmail)) {
+            return res.status(403).json({ error: 'Access denied' });
+        }
+        const AIRTABLE_PAT = process.env.AIRTABLE_PAT;
+        const BASE_ID = process.env.AIRTABLE_BASE_ID;
+        if (!AIRTABLE_PAT || !BASE_ID) return res.status(500).json({ error: 'Airtable configuration missing.' });
+
+        // Prevent returning a verified project
+        if (returned) {
+            const getRes = await fetch(
+                `https://api.airtable.com/v0/${BASE_ID}/YSWS%20Project%20Submission/${recordId}`,
+                { headers: { Authorization: `Bearer ${AIRTABLE_PAT}` } }
+            );
+            if (getRes.ok) {
+                const current = await getRes.json();
+                if (current.fields?.Verified) {
+                    return res.status(400).json({ error: 'Cannot return a verified project. Unverify it first.' });
+                }
+            }
+        }
+
+        const fields = returned
+            ? { Shipped: false, Returned: true, 'Optional - Override Hours Spent Justification': reason || null }
+            : { Returned: null };
+
+        const patchResponse = await fetch(
+            `https://api.airtable.com/v0/${BASE_ID}/YSWS%20Project%20Submission/${recordId}`,
+            {
+                method: 'PATCH',
+                headers: { Authorization: `Bearer ${AIRTABLE_PAT}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ fields })
+            }
+        );
+        const body = await patchResponse.text();
+        if (!patchResponse.ok) return res.status(patchResponse.status).json({ error: 'Airtable patch failed', detail: body });
+        return res.status(200).json({ success: true });
+    } catch (error) {
+        console.error('return-project error:', error);
         return res.status(500).json({ error: 'Internal Server Error' });
     }
 });

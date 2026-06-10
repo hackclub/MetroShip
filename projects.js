@@ -62,6 +62,26 @@ async function getHackatimeUserData() {
 
 
 
+function buildCard(template, record) {
+    const htConnected = record.fields["Hackatime Project Name"] ? 'Yes' : 'No';
+    const returned = record.fields["Returned"] ? 'true' : 'false';
+    const statusBadge = record.fields["Returned"]
+        ? '<span style="background:orange;color:#111;font-size:0.7em;font-weight:bold;padding:1px 6px;border-radius:3px;margin-right:6px;">RETURNED</span>'
+        : '';
+    return template
+        .replace(/{{PROJECT_NAME}}/g, record.fields["Project Name"] || 'Unnamed Project')
+        .replace(/{{EMAIL}}/g, record.fields["Email"] || 'N/A')
+        .replace(/{{HOURS}}/g, '...')
+        .replace(/{{PROJECT_ID}}/g, record.id || '')
+        .replace(/{{HT_CONNECTED}}/g, htConnected)
+        .replace(/{{RETURNED}}/g, returned)
+        .replace(/{{STATUS_BADGE}}/g, statusBadge);
+}
+
+function sectionHeader(title, color) {
+    return `<div style="margin:20px 0 8px 0;padding:6px 14px;border-left:3px solid ${color};color:${color};font-size:1.1vw;font-weight:bold;letter-spacing:0.05em;">${title}</div>`;
+}
+
 async function displayProjects(records) {
     const container = document.getElementById('projects-container');
     if (!container) return;
@@ -69,17 +89,26 @@ async function displayProjects(records) {
     try {
         const template = await (await fetch('project-card.html')).text();
 
-        container.innerHTML = records.map(record => {
-            const htConnected = record.fields["Hackatime Project Name"] ? 'Yes' : 'No';
-            return template
-                .replace(/{{PROJECT_NAME}}/g, record.fields["Project Name"] || 'Unnamed Project')
-                .replace(/{{EMAIL}}/g, record.fields["Email"] || 'N/A')
-                .replace(/{{HOURS}}/g, '...')
-                .replace(/{{PROJECT_ID}}/g, record.id || '')
-                .replace(/{{HT_CONNECTED}}/g, htConnected);
-        }).join('');
+        const returnedRecords  = records.filter(r => r.fields['Returned']);
+        const notShipped       = records.filter(r => !r.fields['Shipped'] && !r.fields['Returned']);
+        const shipped          = records.filter(r => r.fields['Shipped'] && !r.fields['Verified']);
+        const verified         = records.filter(r => r.fields['Shipped'] && r.fields['Verified']);
 
-        // Async: fetch MetroShip hours (from project creation date) per project in parallel
+        const sections = [
+            { label: 'Returned', color: 'orange',    items: returnedRecords },
+            { label: 'Not Shipped', color: '#888',   items: notShipped },
+            { label: 'Shipped',  color: 'aqua',      items: shipped },
+            { label: 'Shipped & Verified', color: 'limegreen', items: verified },
+        ];
+
+        container.innerHTML = sections
+            .filter(s => s.items.length > 0)
+            .map(s =>
+                sectionHeader(s.label, s.color) +
+                s.items.map(r => buildCard(template, r)).join('')
+            ).join('');
+
+        // Async: fetch MetroShip hours per project in parallel
         const accessToken = localStorage.getItem('htaccessToken') || '';
         await Promise.all(records.map(async record => {
             const hoursEl = document.getElementById(`card-hours-${record.id}`);

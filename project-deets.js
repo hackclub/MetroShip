@@ -1,3 +1,5 @@
+let deleteConfirmTimer = null;
+
 document.addEventListener('click', async (e) => {
     // 1. Check for card clicks to open overlay
     // 2. Check for close button or backdrop clicks to close overlay
@@ -58,17 +60,29 @@ document.addEventListener('click', async (e) => {
         const recordId = localStorage.getItem('selectedProjectId');
         if (!recordId) return;
         try {
-            const res = await fetch('/api/patch-project-details', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ recordId, field: 'Shipped', value: newShipped })
-            });
-            const data = await res.json();
+            const calls = [
+                fetch('/api/patch-project-details', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ recordId, field: 'Shipped', value: newShipped })
+                })
+            ];
+            // Re-shipping clears the Returned flag so it doesn't still show as returned
+            if (newShipped) {
+                calls.push(fetch('/api/patch-project-details', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ recordId, field: 'Returned', value: null })
+                }));
+            }
+            const [shipRes] = await Promise.all(calls);
+            const data = await shipRes.json();
             if (data.success) {
                 const airtableProjects = JSON.parse(localStorage.getItem('airtableProjects') || '[]');
                 const record = airtableProjects.find(r => r.id === recordId);
                 if (record) {
                     record.fields['Shipped'] = newShipped;
+                    if (newShipped) record.fields['Returned'] = null;
                     localStorage.setItem('airtableProjects', JSON.stringify(airtableProjects));
                 }
                 updateOverlay(false);
@@ -76,6 +90,90 @@ document.addEventListener('click', async (e) => {
         } catch (err) {
             console.error('Error toggling shipped:', err);
         }
+
+    } else if (e.target.closest('#delete-btn')) {
+        const btn = document.getElementById('delete-btn');
+        if (!btn) return;
+
+        if (btn.dataset.confirming !== 'true') {
+            // First click: arm the button
+            btn.dataset.confirming = 'true';
+            btn.textContent = 'Confirm Delete?';
+            btn.style.borderColor = 'red';
+            btn.style.color = 'red';
+            deleteConfirmTimer = setTimeout(() => {
+                if (btn.dataset.confirming === 'true') {
+                    btn.dataset.confirming = 'false';
+                    btn.textContent = 'Delete Project';
+                    btn.style.borderColor = '#5a0000';
+                    btn.style.color = '#a00000';
+                }
+            }, 5000);
+            return;
+        }
+
+        // Second click: confirmed
+        clearTimeout(deleteConfirmTimer);
+        const recordId = localStorage.getItem('selectedProjectId');
+        const email = localStorage.getItem('email');
+        if (!recordId || !email) return;
+        btn.disabled = true;
+        btn.textContent = 'Deleting...';
+        try {
+            const res = await fetch('/api/delete-project', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ recordId, email })
+            });
+            const data = await res.json();
+            if (data.success) {
+                const airtableProjects = JSON.parse(localStorage.getItem('airtableProjects') || '[]');
+                localStorage.setItem('airtableProjects', JSON.stringify(airtableProjects.filter(r => r.id !== recordId)));
+                localStorage.removeItem('selectedProjectId');
+                const overlay = document.getElementById('overlay');
+                if (overlay) overlay.style.display = 'none';
+                if (typeof fetchProjects === 'function') fetchProjects(email);
+            } else {
+                btn.disabled = false;
+                btn.textContent = 'Error — try again';
+                btn.style.borderColor = 'red';
+                btn.style.color = 'red';
+            }
+        } catch {
+            btn.disabled = false;
+            btn.textContent = 'Error — try again';
+        }
+
+    } else if (e.target.closest('#save-override-response-btn')) {
+        const recordId = localStorage.getItem('selectedProjectId');
+        if (!recordId) return;
+        const input = document.getElementById('override-response-input');
+        const statusEl = document.getElementById('override-response-status');
+        const btn = document.getElementById('save-override-response-btn');
+        if (!input || !btn) return;
+        const value = input.value.trim() || null;
+        btn.disabled = true;
+        if (statusEl) statusEl.textContent = 'Saving...';
+        try {
+            const res = await fetch('/api/patch-project-details', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ recordId, field: 'User Override Response', value })
+            });
+            const data = await res.json();
+            if (data.success) {
+                const airtableProjects = JSON.parse(localStorage.getItem('airtableProjects') || '[]');
+                const record = airtableProjects.find(r => r.id === recordId);
+                if (record) {
+                    record.fields['User Override Response'] = value;
+                    localStorage.setItem('airtableProjects', JSON.stringify(airtableProjects));
+                }
+                if (statusEl) { statusEl.textContent = 'Saved!'; setTimeout(() => { statusEl.textContent = ''; }, 2000); }
+            } else {
+                if (statusEl) statusEl.textContent = 'Error saving';
+            }
+        } catch { if (statusEl) statusEl.textContent = 'Error saving'; }
+        btn.disabled = false;
 
     } else if (e.target.closest('.edit-field-btn')) {
         const field = e.target.closest('.edit-field-btn').dataset.field;
@@ -246,6 +344,40 @@ async function updateOverlay(change) {
             const codeUrl = record.fields["Code URL"] || '';
             const demoUrl = record.fields["Demo URL"] || '';
             const shipped = record.fields["Shipped"] ? 'true' : 'false';
+            const returned = !!record.fields["Returned"];
+            const overrideHours = record.fields['Optional - Override Hours Spent'];
+            const overrideReason = record.fields['Optional - Override Hours Spent Justification'] || '';
+            const userResponse = (record.fields['User Override Response'] || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+            let overrideSectionHtml = '';
+            if (overrideHours != null || overrideReason || returned) {
+                const returnedBanner = returned
+                    ? `<div style="background:#2a0000;border:1px solid red;border-radius:4px;padding:8px 12px;margin-bottom:10px;color:red;font-weight:bold;">&#9888; This project was returned by a reviewer. Please address the feedback and re-ship.</div>`
+                    : '';
+                const overrideBlock = (overrideHours != null || overrideReason)
+                    ? `<div style="margin-bottom:8px;">
+                        ${overrideHours != null ? `<p style="margin:4px 0;">Hours adjusted to: <span style="color:limegreen;font-weight:bold;">${overrideHours}</span></p>` : ''}
+                        ${overrideReason ? `<p style="margin:4px 0;">Reviewer&#39;s note: <span style="color:aqua;">${overrideReason.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span></p>` : ''}
+                       </div>`
+                    : '';
+                overrideSectionHtml = `
+                <div style="margin-top:16px;padding:12px;border:1px solid orange;border-radius:6px;background:#1a1000;">
+                    <p style="color:orange;font-weight:bold;margin:0 0 10px 0;font-size:1.1vw;">Reviewer Feedback</p>
+                    ${returnedBanner}
+                    ${overrideBlock}
+                    <div>
+                        <p style="margin:0 0 4px 0;color:#aaa;font-size:0.95vw;">Your response:</p>
+                        <textarea id="override-response-input" rows="3"
+                            style="background:#111;color:aqua;border:1px solid #444;border-radius:4px;padding:6px;font-size:0.9vw;width:100%;box-sizing:border-box;resize:vertical;font-family:inherit;"
+                            placeholder="Respond to the reviewer...">${userResponse}</textarea>
+                        <div style="margin-top:6px;display:flex;gap:8px;align-items:center;">
+                            <button id="save-override-response-btn"
+                                style="cursor:pointer;padding:4px 14px;border:1px solid aqua;background:#111;color:aqua;border-radius:4px;font-family:inherit;">Save Response</button>
+                            <span id="override-response-status" style="color:limegreen;font-size:0.85vw;"></span>
+                        </div>
+                    </div>
+                </div>`;
+            }
 
             // Chain replacements for all placeholders
             const finalHtml = template
@@ -256,7 +388,8 @@ async function updateOverlay(change) {
                 .replace(/{{DESC}}/g, desc)
                 .replace(/{{CODEURL}}/g, codeUrl)
                 .replace(/{{DEMOURL}}/g, demoUrl)
-                .replace(/{{SHIPPED}}/g, shipped);
+                .replace(/{{SHIPPED}}/g, shipped)
+                .replace(/{{OVERRIDE_SECTION}}/g, overrideSectionHtml);
 
             overlay.innerHTML = finalHtml;
             overlay.style.display = 'block';
