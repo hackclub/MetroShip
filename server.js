@@ -483,6 +483,15 @@ app.post('/api/toggle-verified', async (req, res) => {
         const BASE_ID = process.env.AIRTABLE_BASE_ID;
         if (!AIRTABLE_PAT || !BASE_ID) return res.status(500).json({ error: 'Airtable configuration missing.' });
 
+        // Fetch project record first to get email and hours before patching
+        const projectRes = await fetch(
+            `https://api.airtable.com/v0/${BASE_ID}/YSWS%20Project%20Submission/${recordId}`,
+            { headers: { Authorization: `Bearer ${AIRTABLE_PAT}` } }
+        );
+        if (!projectRes.ok) return res.status(404).json({ error: 'Project record not found' });
+        const projectRecord = await projectRes.json();
+        const pf = projectRecord.fields || {};
+
         const patchResponse = await fetch(
             `https://api.airtable.com/v0/${BASE_ID}/YSWS%20Project%20Submission/${recordId}`,
             {
@@ -493,6 +502,72 @@ app.post('/api/toggle-verified', async (req, res) => {
         );
         const body = await patchResponse.text();
         if (!patchResponse.ok) return res.status(patchResponse.status).json({ error: 'Airtable patch failed', detail: body });
+
+        // Award or deduct tickets based on effective hours
+        const projectEmail = pf['Email'];
+        if (projectEmail) {
+            // Look up user record (need HackatimeToken + current Tickets in one call)
+            const userFormula = encodeURIComponent(`{Email}='${projectEmail}'`);
+            const userLookupRes = await fetch(
+                `https://api.airtable.com/v0/${BASE_ID}/Users?filterByFormula=${userFormula}`,
+                { headers: { Authorization: `Bearer ${AIRTABLE_PAT}` } }
+            );
+            const userRecord = userLookupRes.ok ? (await userLookupRes.json()).records?.[0] : null;
+
+            let effectiveHours = null;
+            const overrideHours = pf['Optional - Override Hours Spent'];
+            if (overrideHours != null && overrideHours !== '') {
+                effectiveHours = Number(overrideHours);
+            } else {
+                // Hours live in Hackatime, not in the project record — fetch them
+                const hackatimeProjectName = pf['Hackatime Project Name'];
+                const userToken = userRecord?.fields?.HackatimeToken;
+                let userId = userRecord?.fields?.HackatimeUserId;
+                if (hackatimeProjectName && userToken) {
+                    const htHeaders = { Authorization: `Bearer ${userToken}`, Accept: 'application/json' };
+                    if (!userId) {
+                        const meRes = await fetch('https://hackatime.hackclub.com/api/v1/authenticated/me', { headers: htHeaders }).catch(() => null);
+                        if (meRes?.ok) {
+                            const meData = await meRes.json();
+                            userId = String(meData.id || meData.username || '');
+                        }
+                    }
+                    if (userId) {
+                        const today = new Date().toISOString().split('T')[0];
+                        const from = projectRecord.createdTime ? projectRecord.createdTime.split('T')[0] : '2024-01-01';
+                        const summaryRes = await fetch(
+                            `https://hackatime.hackclub.com/api/summary?user_id=${encodeURIComponent(userId)}&from=${from}&to=${today}&project=${encodeURIComponent(hackatimeProjectName)}`,
+                            { headers: htHeaders }
+                        ).catch(() => null);
+                        if (summaryRes?.ok) {
+                            const summaryData = await summaryRes.json();
+                            const entry = (summaryData.projects || []).find(p => p.key === hackatimeProjectName);
+                            if (entry?.total != null) effectiveHours = entry.total / 3600;
+                        }
+                    }
+                }
+            }
+
+            console.log(`toggle-verified: effectiveHours=${effectiveHours} for ${projectEmail}`);
+
+            if (effectiveHours != null && userRecord) {
+                const ticketDelta = Math.round(effectiveHours) * (verified ? 1 : -1);
+                const currentTickets = userRecord.fields.Tickets ?? 0;
+                const newTickets = Math.max(0, currentTickets + ticketDelta);
+                await fetch(
+                    `https://api.airtable.com/v0/${BASE_ID}/Users/${userRecord.id}`,
+                    {
+                        method: 'PATCH',
+                        headers: { Authorization: `Bearer ${AIRTABLE_PAT}`, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ fields: { Tickets: newTickets } })
+                    }
+                );
+                console.log(`toggle-verified: ${verified ? 'awarded' : 'deducted'} ${Math.abs(ticketDelta)} tickets ${verified ? 'to' : 'from'} ${projectEmail} (${currentTickets} -> ${newTickets})`);
+            } else {
+                console.log(`toggle-verified: skipping ticket update — effectiveHours=${effectiveHours}, userRecord=${!!userRecord}`);
+            }
+        }
+
         return res.status(200).json({ success: true, data: JSON.parse(body) });
     } catch (error) {
         console.error('toggle-verified error:', error);
