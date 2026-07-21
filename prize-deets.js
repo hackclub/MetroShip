@@ -1,5 +1,7 @@
 // ── Cart state ────────────────────────────────────────────────────────────────
 
+//const { raw } = require("express");
+
 let cart = [];
 
 function cartTotal() {
@@ -93,7 +95,7 @@ async function handleCheckout() {
     }
 
     try {
-        const res = await fetch('/api/submit-order', {
+        const resCheckout = await fetch('/api/submit-order', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -107,24 +109,38 @@ async function handleCheckout() {
                 totalTickets: total
             })
         });
-        const rawText = await res.text();
-        let data;
-        try { data = JSON.parse(rawText); } catch {
-            console.error('submit-order non-JSON response:', rawText);
+        const rawData = await resCheckout.json();
+        console.log(rawData);
+
+        
+
+        if (rawData.success) {
+            const data = rawData.data;
+            console.log(rawData);
+            console.log(data);
+        /*try { data = rawData; } catch {
+            console.error('submit-order non-JSON response:', rawData);
             alert('Checkout failed — server returned an unexpected response (see console).');
             if (checkoutBtn) { checkoutBtn.disabled = false; checkoutBtn.textContent = 'Checkout'; }
             return;
-        }
-        if (data.success) {
+        }*/
+            alert(data);
             cart = [];
             updateCartBadge();
             closeCart();
             const tokenEl = document.getElementById('token-display');
             if (tokenEl) tokenEl.textContent = `Tickets: ${data.remainingTickets}`;
-            window.open('https://airtable.com/app9IYnpxO1DtNd97/pagnQ8SUfeAkkOtAw/form', '_blank');
+            const TargetRecordID = data.id;
+            const formBase2 = 'https://airtable.com/app9IYnpxO1DtNd97/pagnQ8SUfeAkkOtAw/form';
+            const winToOpen = TargetRecordID
+                ? `${formBase2}?prefill_TargetRecordID=${encodeURIComponent(TargetRecordID)}&hide_TargetRecordID=true`
+                : formBase2;
+            winToOpen.target = '_blank';
+
+            window.open(winToOpen);
             alert(`Order placed! You have ${data.remainingTickets} ticket${data.remainingTickets !== 1 ? 's' : ''} remaining.\n\nA shipping address form has opened in a new tab — please fill it out so we can send your prizes.`);
         } else {
-            alert('Error: ' + (data.error || 'Failed to place order'));
+            alert('Error: ' + (rawData.error || 'Failed to place order'));
             if (checkoutBtn) { checkoutBtn.disabled = false; checkoutBtn.textContent = 'Checkout'; }
         }
     } catch (err) {

@@ -863,11 +863,13 @@ app.post('/api/submit-order', async (req, res) => {
                 })
             }
         );
+
         if (!orderRes.ok) {
             const detail = await orderRes.text();
             console.error('submit-order: failed to create Orders record:', detail);
             return res.status(orderRes.status).json({ error: 'Failed to create order' });
         }
+        const orderData = await orderRes.json();
 
         // Deduct tickets
         const newTokens = currentTokens - totalTickets;
@@ -879,8 +881,8 @@ app.post('/api/submit-order', async (req, res) => {
                 body: JSON.stringify({ fields: { Tickets: newTokens } })
             }
         );
-
-        return res.json({ success: true, remainingTickets: newTokens });
+        const returnData = orderData;
+        return res.json({success: true, data: returnData});
     } catch (err) {
         console.error('submit-order error:', err);
         return res.status(500).json({ error: 'Internal Server Error' });
