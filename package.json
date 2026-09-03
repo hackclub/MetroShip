@@ -9,7 +9,7 @@
   "dependencies": {
     "airtable": "^0.12.2",
     "dotenv": "^16.6.1",
-    "express": "^4.22.2",
+    "express": "^5.2.1",
     "pg": "^8.21.0"
   },
   "author": "",
